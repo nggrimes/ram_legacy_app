@@ -2,39 +2,7 @@ library(here)
 library(tidyverse)
 library(shiny)
 library(shinyWidgets)
-load(here("R Data","DBdata[asmt][v4.495].Rdata"))
-
-#Make purrr functions
-find_region<-function(stockid_input){
-  reg<-stock %>% 
-    filter(stockid==stockid_input) %>% 
-    select(region)
-  
-  return(as.character(reg))
-}
-
-find_country<-function(stockid_input){
-  reg<-stock %>% 
-    filter(stockid==stockid_input) %>% 
-    select(primary_country)
-  
-  return(as.character(reg))
-}
-#Clean up RAM legacy
-stocks<-timeseries_values_views %>% 
-  select(c(stockid,stocklong,year,BdivBmsypref,UdivUmsypref,TCbest,CdivMSY)) %>% 
-  drop_na() %>% 
-  group_by(stockid) %>% 
-  mutate(MSY=TCbest/CdivMSY) %>% 
-  mutate(max_year=max(year)) %>% 
-  filter(year==unique(max_year)) %>% 
-  ungroup() %>% 
-  mutate(region=map_chr(.x=stockid,.f=~find_region(.x)),
-         country=map_chr(.x=stockid,.f=~find_country(.x))) %>% 
-  rename(BvBmsy=BdivBmsypref,FvFmsy=UdivUmsypref) %>% 
-  select(-c(max_year,TCbest,CdivMSY))
-#Work getting full selection and identifying ITQs
-
+load("https://github.com/nggrimes/ram_legacy_app/ram_clean_shiny.Rdata")
 
 
 ui<-fluidPage(
